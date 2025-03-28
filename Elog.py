@@ -5,10 +5,6 @@ import re
 
 class Elog:
     def run_powershell(self, cmd: str):
-        """
-        PowerShell buyruğini ishga tushirib, natijani JSON formatida qaytaradi.
-        Xatolik yuz bersa, xato tafsilotlari bilan qaytaradi.
-        """
         process = subprocess.run(
             ["powershell", "-NoProfile", "-Command", cmd],
             capture_output=True, text=True, encoding="utf-8"
@@ -34,9 +30,6 @@ class Elog:
         return re.sub(r"\n+", "\n", message)
 
     def _get_logs(self, cmd: str):
-        """
-        Umumiy loglarni olish uchun yordamchi metod.
-        """
         result = self.run_powershell(cmd)
         if isinstance(result, list):
             for log in result:
@@ -47,17 +40,11 @@ class Elog:
         return result
 
     def get_event_logs(self, log_name: str, limit: int = 10):
-        """
-        An'anaviy Windows Event loglarini oladi.
-        """
         cmd = f'Get-EventLog -LogName {log_name} -Newest {limit} | ' \
               f'Select-Object TimeGenerated, EntryType, Source, Message | ConvertTo-Json -Depth 2'
         return self._get_logs(cmd)
 
     def get_win_event_logs(self, log_name: str, limit: int = 10):
-        """
-        Yangi formatdagi Windows loglarini oladi (WinEvent).
-        """
         cmd = f'Get-WinEvent -LogName "{log_name}" -MaxEvents {limit} | ' \
               f'Select-Object TimeCreated, Id, LevelDisplayName, ProviderName, Message | ConvertTo-Json -Depth 2'
         return self._get_logs(cmd)
@@ -89,7 +76,7 @@ class Elog:
     def monitor_sysmon_logs(self, limit: int = 10, delay: int = 2):
         """
         Sysmon loglarini real vaqt rejimida monitoring qiladi.
-        To‘xtatish uchun Ctrl + C bosing.
+        To'xtatish uchun Ctrl + C ni bosing.
         """
         print("🟢 Sysmon monitoring boshlandi... (To‘xtatish: Ctrl + C)")
         try:
