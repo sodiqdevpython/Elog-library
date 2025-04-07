@@ -88,12 +88,5 @@ class Elog:
     def get_wmi_logs(self, limit=10):
         return self.get_win_event_logs('Microsoft-Windows-WMI-Activity/Operational', limit)
 
-    def monitor_sysmon_logs(self, limit=10, delay=2):
-        print("🟢 Sysmon monitoring... (Ctrl+C to stop)")
-        try:
-            while True:
-                logs = self.get_sysmon_logs(limit)
-                print(json.dumps(logs, indent=4, ensure_ascii=False))
-                time.sleep(delay)
-        except KeyboardInterrupt:
-            print("\n🔴 Monitoring stopped.")
+    def logs_to_json(self, logs_dict_or_list):
+        return json.dumps(logs_dict_or_list, indent=4, ensure_ascii=False)
