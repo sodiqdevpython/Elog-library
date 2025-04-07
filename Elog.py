@@ -23,10 +23,12 @@ class Elog:
     def _convert_dotnet_date(self, date_str):
         m = re.match(r"/Date\((\d+)", date_str)
         if m:
+            # Convert milliseconds to seconds and format to human-readable
             return datetime.utcfromtimestamp(int(m.group(1)) / 1000).strftime("%Y-%m-%d %H:%M:%S")
         return date_str
 
     def _parse_message_to_dict(self, msg):
+        # Message fields often separated by "; " or newlines, so split accordingly
         parts = [part.strip() for part in re.split(r';\s*', msg) if part.strip()]
         data = {}
         for part in parts:
@@ -48,7 +50,7 @@ class Elog:
         elif isinstance(logs, dict):
             for k in ['TimeCreated', 'TimeGenerated']:
                 if k in logs and isinstance(logs[k], str):
-                    logs[k] = self._convert_dotnet_date(logs[k])
+                    logs[k] = self._convert_dotnet_date(log[k])
             if 'Message' in logs:
                 logs['Message'] = self._parse_message_to_dict(logs['Message'])
         return logs
@@ -90,3 +92,7 @@ class Elog:
 
     def logs_to_json(self, logs_dict_or_list):
         return json.dumps(logs_dict_or_list, indent=4, ensure_ascii=False)
+
+    def save_logs_to_json_file(self, logs_dict_or_list, filename):
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(logs_dict_or_list, f, indent=4, ensure_ascii=False)
